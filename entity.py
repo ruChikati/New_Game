@@ -2,6 +2,7 @@
 import pygame
 
 import input
+import particle
 
 
 class Entity:
@@ -56,8 +57,8 @@ class Player(Entity):
         super().__init__(x, y, w, h, 'player', img, game)
         self.anims = {anim.split(self.name)[-1]: self.game.assets.anims.anims[anim] for anim in self.game.assets.anims.anims if self.name in anim}
         self.gravity = gravity
-        self.vel_cap = 20
-        self.speed = 4
+        self.vel_cap = 15
+        self.speed = 1.8
 
     def update(self):   # TODO: only get chunks in vicinity of player
         for event in self.game.last_input:
@@ -71,10 +72,28 @@ class Player(Entity):
                         self.vel[0] -= self.speed
                     case input.D:
                         self.vel[0] += self.speed
+                    case input.F:
+                        particle.ParticleBurst((self.x, self.y), 5, 20, ((255, 0, 0),), 3 * self.game.fps, 3 * self.game.fps, 2, self.game)
+                        pass    # TODO: spawn particles, add option for game to just handle this, maybe I already did?
                     case input.RETURN:
                         self.x, self.y = 0, 0
                         self.rect.x, self.rect.y = 0, 0
                         self.vel = [0, 0]
+                    case input.SPACE:
+                        for i in range(3):
+                            collision_directions = self.move(self.game.assets.worlds.get_active_world().level.collision_mesh,self.game.dt)
+                            if collision_directions['down'] or collision_directions['up']:
+                                self.vel[1] = 0
+                            if collision_directions['right'] or collision_directions['left']:
+                                self.vel[0] = 0
+                            if self.vel[0] > 0:
+                                self.vel[0] -= 1
+                            elif self.vel[0] < 0:
+                                self.vel[0] += 1
+                            if self.vel[1] > 0:
+                                self.vel[1] -= 1
+                            elif self.vel[1] < 0:
+                                self.vel[1] += 1
         if self.vel[0] > self.vel_cap:
             self.vel[0] = self.vel_cap
         if self.vel[1] > self.vel_cap:
