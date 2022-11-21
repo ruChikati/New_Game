@@ -23,6 +23,8 @@ class Game:
         player_surf.fill((255, 255, 255, 0))
         self.player = entity.Player(0, 0, 24, 31, player_surf, self, 0)
 
+        self.particles = []
+
     def update(self):
         self.dt = time.time() - self.lt
         self.dt *= self.fps
@@ -35,6 +37,8 @@ class Game:
                 if event.key == input.ESCAPE:
                     self.stop()
             self.last_input.append(event)
+        for particles in self.particles:
+            particles.update(self.dt)
         self.assets.update(self.dt)
         self.clock.tick(self.fps)
 

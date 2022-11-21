@@ -73,8 +73,12 @@ class Chunk:
     def __contains__(self, rect):
         if isinstance(rect, Tile):
             return rect in self.tiles
-        else:
+        elif isinstance(rect, pygame.Rect):
             return bool(self.rect.contains(rect))
+        elif isinstance(rect, list) or isinstance(rect, tuple):
+            return bool(self.rect.collidepoint(rect))
+        else:
+            return False
 
     def __eq__(self, other):
         try:
@@ -88,7 +92,7 @@ class Chunk:
 
     def get_collision_mesh(self):
         tiles = [tile.rect for tile in self.tiles if tile.is_solid]
-        for i in range(len(tiles) // 20):   # to reduce runtime divide by a number, since most of the passes will likely will be completed by then; 20 seems to fit, recursion is slowr since it takes n passes
+        for i in range(len(tiles) // 20):   # to reduce runtime divide by a number, since most of the passes will likely be completed by then; 20 seems to fit, recursion is slower since it takes n more passes
             for tile1 in tiles:
                 for tile2 in tiles:
                     if tile1 == tile2:
@@ -117,6 +121,14 @@ class Level:
         self.chunk_size = CHUNK_SIZE
         self.collision_mesh = self.get_collision_mesh()
 
+    def get_chunks_at_points(self, points):
+        return_list = []
+        for chunk in self.chunks:
+            for point in points:
+                if point in chunk:
+                    return_list.append(chunk)
+        return return_list
+
     def get_all_tiles(self):
         return_list = []
         for chunk in self.chunks:
@@ -124,15 +136,14 @@ class Level:
                 return_list.append(tile)
         return return_list
 
-    def get_collision_mesh(self, chunks=()):
+    def get_collision_mesh(self, points=()):
         return_list = []
-        if not chunks:
+        if not points:
             for chunk in self.chunks:
                 for tile in chunk.collision_mesh:
                     return_list.append(tile)
         else:
-            for pos in chunks:
-                chunk = self.chunks_dict[pos]
+            for chunk in self.get_chunks_at_points(points):
                 for tile in chunk.collision_mesh:
                     return_list.append(tile)
         return return_list
