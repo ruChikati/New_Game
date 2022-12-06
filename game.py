@@ -22,7 +22,6 @@ class Game:
         player_surf = pygame.Surface((24, 31), pygame.SRCALPHA)
         player_surf.fill((255, 255, 255, 0))
         self.player = entity.Player(0, 0, 24, 31, player_surf, self, 0)
-
         self.particles = []
 
     def update(self):
