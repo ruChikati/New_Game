@@ -50,7 +50,7 @@ class Particle:
 
 class ParticleBurst:    # TODO add a bit of rondomness in burst type, in vel of both directions
 
-    def __init__(self, pos, size, amount, colours, time_to_live, particle_time_to_live, speed, game, type='burst', shape='circle', width=0, shrink=False, fade=True, gravity=0):
+    def __init__(self, pos, size, amount, colours, time_to_live, particle_time_to_live, speed, game, type='burst', shape='circle', width=0, shrink=False, fade=True, gravity=0, spread=1):
         self.particles = []
         self.starting_time = time_to_live
         self.time = time_to_live
@@ -70,16 +70,17 @@ class ParticleBurst:    # TODO add a bit of rondomness in burst type, in vel of 
         self.shrink = shrink
         self.fade = fade
         self.gravity = gravity
+        self.spread = spread
         self.particle_time = particle_time_to_live
         if self.amount >= 0:    # if amount is negative, new particles are added every frame, else the specified amount are added at the beginning
             match type:
                 case 'burst' | 'circle':
                     for i in range(amount):
                         theta = random.random() * 2 * math.pi
-                        self.particles.append(Particle(random.choice(self.colours), [self.middle[0] - size // 2, self.middle[1] - size // 2], [speed[0] * math.cos(theta) * random.random(), speed[1] * math.sin(theta) * random.random()], size, particle_time_to_live, self.game, shape, width, shrink, fade, gravity))
+                        self.particles.append(Particle(random.choice(self.colours), [self.middle[0] - size // 2, self.middle[1] - size // 2], [speed[0] * math.cos(theta) * random.random() + (2 * self.spread * random.random() - self.spread), speed[1] * math.sin(theta) * random.random() + (2 * self.spread * random.random() - self.spread)], size, particle_time_to_live, self.game, shape, width, shrink, fade, gravity))
                 case 'fountain' | 'pillar':
                     for i in range(amount):
-                        self.particles.append(Particle(random.choice(self.colours), [self.middle[0] - size // 2, self.middle[1] - size // 2], [(2 * random.random() - 1) * speed[0], -2 * speed[1]], size, particle_time_to_live, self.game, shape, width, shrink, fade, gravity))
+                        self.particles.append(Particle(random.choice(self.colours), [self.middle[0] - size // 2, self.middle[1] - size // 2], [(2 * random.random() - 1) * speed[0] + (2 * self.spread * random.random() - self.spread), -2 * speed[1] + (2 * self.spread * random.random() - self.spread)], size, particle_time_to_live, self.game, shape, width, shrink, fade, gravity))
                 # [self.middle[0], self.middle[1]], because it didn't work with just self.middle
 
     def update(self, dt, vel_update=(0, 0)):
@@ -93,9 +94,9 @@ class ParticleBurst:    # TODO add a bit of rondomness in burst type, in vel of 
             match self.type:
                 case 'burst' | 'circle':
                     theta = random.random() * 2 * math.pi
-                    self.particles.append(Particle(random.choice(self.colours), [self.middle[0] - self.size // 2, self.middle[1] - self.size // 2], [self.speed[0] * math.cos(theta) * random.random(), self.speed[1] * math.sin(theta) * random.random()], self.size, self.particle_time, self.game, self.shape, self.width, self.shrink, self.fade, self.gravity))
+                    self.particles.append(Particle(random.choice(self.colours), [self.middle[0] - self.size // 2, self.middle[1] - self.size // 2], [self.speed[0] * math.cos(theta) * random.random() + (2 * self.spread * random.random() - self.spread), self.speed[1] * math.sin(theta) * random.random() + (2 * self.spread * random.random() - self.spread)], self.size, self.particle_time, self.game, self.shape, self.width, self.shrink, self.fade, self.gravity))
                 case 'fountain' | 'pillar':
-                    self.particles.append(Particle(random.choice(self.colours), [self.middle[0] - self.size // 2, self.middle[1] - self.size // 2], [(2 * random.random() - 1) * self.speed[0], -2 * self.speed[1]], self.size, self.particle_time, self.game, self.shape, self.width, self.shrink, self.fade, self.gravity))
+                    self.particles.append(Particle(random.choice(self.colours), [self.middle[0] - self.size // 2, self.middle[1] - self.size // 2], [(2 * random.random() - 1) * self.speed[0] + (2 * self.spread * random.random() - self.spread), -2 * self.speed[1] + (2 * self.spread * random.random() - self.spread)], self.size, self.particle_time, self.game, self.shape, self.width, self.shrink, self.fade, self.gravity))
         if len(self.particles) > 100_000:
             for i in range(100):
                 self.particles.pop(i)

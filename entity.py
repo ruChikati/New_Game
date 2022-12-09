@@ -87,7 +87,7 @@ class Player(Entity):
 
         collision_directions = self.move(self.game.assets.worlds.get_active_world().level.collision_mesh, self.game.dt)
         if self.vel[0] or self.vel[1]:
-            self.game.particles.append(particle.ParticleBurst((self.x + self.w // 2, self.y + self.h // 2), 10, 7, ((255, 250, 250), (255, 255, 240), (245, 245, 245), (255, 255, 255)), 40, 40, (-self.vel[0] // 3, -self.vel[1] // 3), self.game))
+            self.game.particles.append(particle.ParticleBurst((self.x + self.w // 2, self.y + self.h // 2), 4, 10, ((255, 250, 250), (255, 255, 240), (245, 245, 245), (255, 255, 255), (254, 222, 23)), 40, 40, (-self.vel[0] // 3, -self.vel[1] // 3), self.game, shape='rect', spread=1.5))
         if collision_directions['down'] or collision_directions['up']:
             self.vel[1] = 0
         if collision_directions['right'] or collision_directions['left']:
