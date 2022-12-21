@@ -62,8 +62,14 @@ class Chunk:
 
     def __init__(self, tile_list, game):    # pass in list from json file as tile in tile_list
         self.tiles = []
+        self.solid_tiles = []
+        self.unsolid_tiles = []
         for tile in tile_list:
             self.tiles.append(Tile(*tile, game))
+            if tile[7]:
+                self.solid_tiles.append(Tile(*tile, game))
+            else:
+                self.unsolid_tiles.append(Tile(*tile, game))
         self.pos = self.x, self.y = min(tile.x for tile in self.tiles), min(tile.y for tile in self.tiles)
         self.size = CHUNK_SIZE
         self.chunk_pos = self.chunk_x, self.chunk_y = self.x // self.size, self.y // self.size
@@ -86,9 +92,18 @@ class Chunk:
         except AttributeError:
             return False
 
-    def update(self, surf=None):
-        for tile in self.tiles:
-            tile.update(surf)
+    def update(self, surf=None, tile_type=0):
+        """:type: 0 for all tiles, 1 for solid tiles, 2 for unsolid tiles"""
+        if tile_type == 1:
+            for tile in self.solid_tiles:
+                tile.update(surf)
+        elif tile_type == 2:
+            for tile in self.unsolid_tiles:
+                tile.update(surf)
+        else:
+            for tile in self.tiles:
+                tile.update(surf)
+
 
     def get_collision_mesh(self):
         tiles = [tile.rect for tile in self.tiles if tile.is_solid]
@@ -148,9 +163,9 @@ class Level:
                     return_list.append(tile)
         return return_list
 
-    def update(self, surf=None):
+    def update(self, surf=None, tile_type=0):
         for chunk in self.chunks:
-            chunk.update(surf)
+            chunk.update(surf, tile_type)
 
 
 class World:
@@ -161,8 +176,8 @@ class World:
         self.entities = entities
         self.game = game
 
-    def update(self, dt, surf=None):
-        self.level.update(surf)
+    def update(self, dt, surf=None, tile_type=0):
+        self.level.update(surf, tile_type)
         for entity in self.entities:
             if entity.is_active:
                 entity.update(surf, dt)
@@ -180,8 +195,8 @@ class WorldManager:
         self.active_world = '0'
         self.game = game
 
-    def update(self, dt, surf=None):
-        self.worlds[self.active_world].update(dt, surf=surf)
+    def update(self, dt, surf=None, tile_type=0):
+        self.worlds[self.active_world].update(dt, surf, tile_type)
 
     def get_active_world(self):
         return self.worlds[self.active_world]

@@ -36,8 +36,6 @@ class Game:
                 if event.key == input.ESCAPE:
                     self.stop()
             self.last_input.append(event)
-        for particles in self.particles:
-            particles.update(self.dt)
         self.assets.update(self.dt)
         self.clock.tick(self.fps)
 

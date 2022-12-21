@@ -19,7 +19,7 @@ class Entity:
         self.vel = [0, 0]
 
     def update(self):
-        collision_directions = self.move(self.game.assets.worlds.get_active_world().level.collision_mesh, self.game.dt)
+        collision_directions, amount_moved = self.move(self.game.assets.worlds.get_active_world().level.collision_mesh, self.game.dt)
         if collision_directions['down'] or collision_directions['up']:
             self.vel[1] = 0
         if collision_directions['right'] or collision_directions['left']:
@@ -28,6 +28,7 @@ class Entity:
 
     def move(self, tiles, dt):
         collision_directions = {'up': False, 'down': False, 'left': False, 'right': False}
+        orig_x, orig_y = self.rect.x / 1, self.rect.y / 1
         self.rect.x += self.vel[0] * dt
         collision_tiles = [tile for tile in tiles if self.rect.colliderect(tile)]
         for tile in collision_tiles:
@@ -47,7 +48,8 @@ class Entity:
                 self.rect.y = tile.bottom
                 collision_directions['up'] = True
         self.y, self.x = self.rect.y, self.rect.x
-        return collision_directions
+        amount_moved = self.x - orig_x, self.y - orig_y
+        return collision_directions, amount_moved
 
 
 class Player(Entity):
@@ -85,9 +87,9 @@ class Player(Entity):
             self.vel[1] = -self.vel_cap
         self.vel[1] += self.gravity
 
-        collision_directions = self.move(self.game.assets.worlds.get_active_world().level.collision_mesh, self.game.dt)
-        if self.vel[0] or self.vel[1]:
-            self.game.particles.append(particle.ParticleBurst((self.x + self.w // 2, self.y + self.h // 2), 4, 10, ((255, 250, 250), (255, 255, 240), (245, 245, 245), (255, 255, 255), (254, 222, 23)), 40, 40, (-self.vel[0] // 3, -self.vel[1] // 3), self.game, shape='rect', spread=1.5))
+        collision_directions, amount_moved = self.move(self.game.assets.worlds.get_active_world().level.collision_mesh, self.game.dt)
+        if amount_moved[0] or amount_moved[1]:
+            self.game.particles.append(particle.ParticleBurst((self.x + self.w // 2, self.y + self.h // 2), 7, 10, ((255, 250, 250), (255, 255, 240), (245, 245, 245), (255, 255, 255), (254, 222, 23)), 40, 40, (-amount_moved[0] // 3, -amount_moved[1] // 3), self.game, shape='rect', spread=1.5))
         if collision_directions['down'] or collision_directions['up']:
             self.vel[1] = 0
         if collision_directions['right'] or collision_directions['left']:

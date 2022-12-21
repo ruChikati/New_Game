@@ -11,11 +11,10 @@ import font
 import general_funcs
 import input
 import level
-import particle
 import sfx
 
 
-class Assets:   # TODO, add UI when it's done
+class Assets:   # to do, add UI when it's done
 
     def __init__(self, game, camera_specs=(pygame.display.Info().current_w, pygame.display.Info().current_h, f'data{os.sep}cutscenes', (24, 18, 24)), sfx_path=f'data{os.sep}sfx', world_path=f'data{os.sep}worlds', anim_path=f'data{os.sep}anims', font_path=f'data{os.sep}fonts'):
         self.camera = camera.Camera(camera_specs[0], camera_specs[1], game, camera_specs[2], camera_specs[3])
@@ -25,12 +24,14 @@ class Assets:   # TODO, add UI when it's done
         self.anims = animation.AnimationManager(anim_path, game)
         self.fonts = font.FontManager(font_path)
         self.input = input.Input(game, 128)
-        self.particle = particle
         self.game = game
 
     def update(self, dt):
         self.sfx.update()
-        self.worlds.update(dt)
+        self.worlds.update(dt, tile_type=2)
+        for particles in self.game.particles:
+            particles.update(self.game.dt)
+        self.worlds.update(dt, tile_type=1)
         self.game.player.update()
         self.camera.center((self.game.player.x, self.game.player.y))
         self.camera.update()
