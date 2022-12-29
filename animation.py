@@ -51,7 +51,7 @@ class Animation:
             else:
                 raise FileTypeError(frame.split('.')[-1])
         if len(self.frames) > len(self.frame_paths) + 1:
-            self.config['frames'] += [5 for i in range(len(self.frames) - len(self.frame_paths))]
+            self.config['frames'] += [5] * (len(self.frames) - len(self.frame_paths))
         elif len(self.frames) < (len(self.frame_paths) - 1):
             raise LengthError('Not enough frames in animation')
         self._get_img()
