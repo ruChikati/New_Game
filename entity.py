@@ -60,6 +60,7 @@ class Player(Entity):
         self.gravity = gravity
         self.vel_cap = 8
         self.speed = 2
+        self.fwd = 0.
 
     def update(self):
         raw_movement_directions = {'down': False, 'up': False, 'left': False, 'right': False}

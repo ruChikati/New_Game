@@ -6,10 +6,6 @@ import pygame
 import general_funcs as funcs
 
 
-def init():
-    pass
-
-
 class FileTypeError(Exception):
 
     def __init__(self, type):
@@ -41,7 +37,7 @@ class Animation:
         try:
             self.config = funcs.read_json(f'{self.path}{os.sep}config.json')
         except FileNotFoundError:
-            self.config = {'frames': [5 for frame in self.frame_paths], 'speed': 1., 'loop': False, 'offset': [0, 0], 'centre': False}
+            self.config = {'frames': [5] * len(self.frame_paths), 'speed': 1., 'loop': False, 'offset': [0, 0], 'centre': False}
             funcs.write_json(f'{self.path}{os.sep}config.json', self.config)
         self.frame_durations = funcs.sum_list(self.config['frames'])
         self.frames = []
