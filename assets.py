@@ -28,10 +28,9 @@ class Assets:   # to do, add UI when it's done
 
     def update(self, dt):
         self.sfx.update()
-        self.worlds.update(dt, tile_type=2)
+        self.worlds.update(dt, tile_type=0)
         for particles in self.game.particles:
             particles.update(self.game.dt)
-        self.worlds.update(dt, tile_type=1)
         self.game.player.update()
         self.camera.center((self.game.player.x, self.game.player.y))
         self.camera.update()

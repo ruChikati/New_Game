@@ -18,7 +18,7 @@ class SFXManager:
         self.queue = []
         for file in os.listdir(f'{self.path}{os.sep}sounds'):
             if '.' not in file:
-                self.sounds[file] = [pygame.mixer.Sound(sound) for sound in os.listdir(f'{self.path}{os.sep}sounds{os.sep}{file}') if sound[0] != '.']
+                self.sounds[file] = [pygame.mixer.Sound(f'{self.path}{os.sep}sounds{os.sep}{file}{os.sep}{sound}') for sound in os.listdir(f'{self.path}{os.sep}sounds{os.sep}{file}') if sound[0] != '.']
         for file in os.listdir(f'{self.path}{os.sep}music'):
             if '.' not in file:
                 self.music[file] = [music for music in os.listdir(f'{self.path}{os.sep}music{os.sep}{file}') if music[0] != '.']
