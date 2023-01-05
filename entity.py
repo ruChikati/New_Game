@@ -2,6 +2,7 @@
 import pygame
 
 import input
+import math
 import particle
 
 class Entity:
@@ -60,42 +61,36 @@ class Player(Entity):
         self.gravity = gravity
         self.vel_cap = 8
         self.speed = 2
+        self.rot_speed = 3
         self.fwd = 0.
 
     def update(self):
-        raw_movement_directions = {'down': False, 'up': False, 'left': False, 'right': False}
         particle_colours = ((255, 250, 250), (255, 255, 240), (245, 245, 245), (255, 255, 255), (169, 169, 169), (129, 133, 137), (211, 211, 211), (137, 148, 153), (229, 228, 226), (192, 192, 192), (132, 136, 132))
         for event in self.game.last_input:
             if event.type == input.KEYHOLD:
                 match event.key:
-                    case input.S:
-                        self.vel[1] += self.speed
-                        raw_movement_directions['down'] = True
-                        self.game.particles.append(particle.ParticleBurst((self.x + self.w // 2, self.y + self.h // 2), 7, 25, particle_colours, 80, 80, (0, self.vel[1]), self.game, type='|', shape='rect', fade=True, spread=2))
-                        self.game.particles.append(particle.ParticleBurst((self.x + self.w // 2, self.y), 7, 25, particle_colours, 80, 80, (0, self.vel[1]), self.game, type='|', shape='rect', fade=True, spread=2))
-                        #self.game.assets.sfx.play('noise')
-                    case input.W:
-                        self.vel[1] -= self.speed
-                        raw_movement_directions['up'] = True
-                        self.game.particles.append(particle.ParticleBurst((self.x + self.w // 2, self.y + self.h // 2), 7, 25, particle_colours, 80, 80, (0, self.vel[1]), self.game, type='|', shape='rect', fade=True, spread=2))
-                        self.game.particles.append(particle.ParticleBurst((self.x + self.w // 2, self.y + self.h), 7, 25, particle_colours, 80, 80, (0, self.vel[1]), self.game, type='|', shape='rect', fade=True, spread=2))
+
+                    case input.SPACE:
+                        self.vel[1] -= self.speed * math.sin(math.radians(self.fwd))
+                        self.vel[0] += self.speed * math.cos(math.radians(self.fwd))
+                        self.game.particles.append(particle.ParticleBurst((self.x + self.w // 2, self.y + self.h // 2), 7, 25, particle_colours, 80, 80, (-self.speed * math.cos(self.fwd), self.speed * math.sin(math.radians(self.fwd))), self.game, type='o', shape='rect', fade=True, spread=2))
+                        self.game.particles.append(particle.ParticleBurst((self.x + self.w // 2, self.y + self.h), 7, 25, particle_colours, 80, 80, (-self.speed * math.cos(self.fwd), self.speed * math.sin(math.radians(self.fwd))), self.game, type='o', shape='rect', fade=True, spread=2))
                         #self.game.assets.sfx.play('noise')
                     case input.A:
-                        self.vel[0] -= self.speed
-                        raw_movement_directions['left'] = True
-                        self.game.particles.append(particle.ParticleBurst((self.x + self.w // 2, self.y + self.h // 2), 7, 25, particle_colours, 80, 80, (self.vel[0], 0), self.game, type='-', shape='rect', fade=True, spread=2))
-                        self.game.particles.append(particle.ParticleBurst((self.x + self.w, self.y + self.h // 2), 7, 25, particle_colours, 80, 80, (self.vel[0], 0), self.game, type='-', shape='rect', fade=True, spread=2))
+                        self.fwd += self.rot_speed
+                        # self.game.particles.append(particle.ParticleBurst((self.x + self.w // 2, self.y + self.h // 2), 7, 25, particle_colours, 80, 80, (self.vel[0], 0), self.game, type='-', shape='rect', fade=True, spread=2))
+                        # self.game.particles.append(particle.ParticleBurst((self.x + self.w, self.y + self.h // 2), 7, 25, particle_colours, 80, 80, (self.vel[0], 0), self.game, type='-', shape='rect', fade=True, spread=2))
                         #self.game.assets.sfx.play('noise')
                     case input.D:
-                        self.vel[0] += self.speed
-                        raw_movement_directions['right'] = True
-                        self.game.particles.append(particle.ParticleBurst((self.x + self.w // 2, self.y + self.h // 2), 7, 25, particle_colours, 80, 80, (self.vel[0], 0), self.game, type='-', shape='rect', fade=True, spread=2))
-                        self.game.particles.append(particle.ParticleBurst((self.x, self.y + self.h // 2), 7, 25, particle_colours, 80, 80, (self.vel[0], 0), self.game, type='-', shape='rect', fade=True, spread=2))
+                        self.fwd -= self.rot_speed
+                        self.game.particles.append(particle.ParticleBurst((self.x, self.y + self.h // 2), 2, 15, particle_colours, 80, 80, (self.rot_speed * math.cos(math.radians(self.fwd + 0)), self.rot_speed * -math.sin(math.radians(self.fwd + 0))), self.game, type='-', shape='rect', fade=True, spread=2))
                         #self.game.assets.sfx.play('noise')
                     case input.RETURN:
+                        # for debugging, is going to be removed in the final release
                         self.x, self.y = 0, 0
                         self.rect.x, self.rect.y = 0, 0
                         self.vel = [0, 0]
+                        self.fwd = 0.
 
         if self.vel[0] > self.vel_cap:
             self.vel[0] = self.vel_cap
@@ -116,14 +111,16 @@ class Player(Entity):
         if collision_directions['right'] or collision_directions['left']:
             self.vel[0] = 0
 
-        # if self.vel[0] > 0:
-        #     self.vel[0] -= 1
-        # elif self.vel[0] < 0:
-        #     self.vel[0] += 1
-        # if self.vel[1] > 0:
-        #     self.vel[1] -= 1
-        # elif self.vel[1] < 0:
-        #     self.vel[1] += 1
+        if self.vel[0] > 0:
+            self.vel[0] -= 1
+        elif self.vel[0] < 0:
+            self.vel[0] += 1
+        if self.vel[1] > 0:
+            self.vel[1] -= 1
+        elif self.vel[1] < 0:
+            self.vel[1] += 1
 
         self.anims[self.action].play(self.game.dt)
+        self.anims[self.action].img = pygame.transform.rotate(self.anims[self.action].img, self.fwd)
+        self.anims[self.action].img.set_colorkey((1, 1, 1))
         self.anims[self.action].render_main((self.x, self.y))

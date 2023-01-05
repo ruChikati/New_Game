@@ -76,10 +76,10 @@ class ParticleBurst:
             match type:
                 case 'fountain' | 'pillar' | '|' | '!':
                     for i in range(amount):
-                        self.particles.append(Particle(random.choice(self.colours), [self.middle[0] - size // 2 + (10 * random.random() - 5), self.middle[1] - size // 2 + (10 * random.random() - 5)], [(2 * random.random() - 1) * speed[0] + (2 * self.spread * random.random() - self.spread), -2 * speed[1] + (2 * self.spread * random.random() - self.spread)], size, particle_time_to_live, self.game, shape, width, shrink, fade, gravity))
-                case 'beam' | '-' | '_' | 'line':
+                        self.particles.append(Particle(random.choice(self.colours), [self.middle[0], self.middle[1]], [(2 * random.random() - 1) * speed[0] + (2 * self.spread * random.random() - self.spread), -2 * speed[1] + (2 * self.spread * random.random() - self.spread)], size, particle_time_to_live, self.game, shape, width, shrink, fade, gravity))
+                case 'beam' | 'line' | '-' | '_':
                     for i in range(amount):
-                        self.particles.append(Particle(random.choice(self.colours), [self.middle[0] - size // 2 + (10 * random.random() - 5), self.middle[1] - size // 2 + (10 * random.random() - 5)], [-2 * speed[0] + (2 * self.spread * random.random() - self.spread), (2 * random.random() - 1) * speed[1] + (2 * self.spread * random.random() - self.spread)], size, particle_time_to_live, self.game, shape, width, shrink, fade, gravity))
+                        self.particles.append(Particle(random.choice(self.colours), [self.middle[0], self.middle[1]], [-2 * speed[0], speed[1]], size, particle_time_to_live, self.game, shape, width, shrink, fade, gravity))
                 case _:
                     for i in range(amount):
                         theta = random.random() * 2 * math.pi
